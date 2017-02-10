@@ -1,0 +1,17 @@
+on the master branch, theres a zipped folder containing all the 
+card prices seperated into sets.
+each card contains "fair trade price" and "best buylist price".
+
+- to extract into the multiple files on linux, use tar -xzvf price-by-set.tar.gz
+- json files, once loaded into a variable, are treated like dictionnaries (same thing as a map in c++)
+- to do this, use:
+##################################
+fileName = "12_myFileName.json"
+
+with open(fileName) as file:
+	data = json.load(file)
+print("Done reading json file for set names.")
+##################################
+ - Then, to access the data, simply do:
+data["cardName"][0]  #for "fair trade price"
+data["cardName"][1]  #for "best buylist price"
