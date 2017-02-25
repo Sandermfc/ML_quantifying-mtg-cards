@@ -7,7 +7,7 @@ nGramDict = {};
 def main():
 	#open the big json file containing our dataset, I'll refer to this as bigFile from here on out
 	with open("AllSets-x.json") as file1:
-		data = json.load(file1)
+		data = json.load(file1);
 
 	#create a conversion table from setName to setCode (setCode is the format used in AllSets-x.json)
 	setCode = {};
@@ -44,19 +44,24 @@ def main():
 					###DESCRIPTION###
 					#################
 					if "originalText" in card:
-						print(card["originalText"].encode('utf-8'));
+						#print(card["originalText"].encode('utf-8'));
 						getNGramCount(card["name"].encode('utf-8'), price, card["originalText"].encode('utf-8'), setName);
 					else:
 						print("NO ORIGINAL TEXT, GIVING VALUE OF 0");
-					#Converted manacost
-					#if "cmc" in card:
-						#getCMC(card["cmc"]);
-					#else:
-						#print("NO CONVERTED MANACOST, GIVING CMC OF 0");
-					#if "manaCost" in card:
-						#getManaCharacteristics(card["manaCost"]);
-					#else:
-						#print("NO MANACOST FOUND");
+					########################
+					###Converted manacost###
+					########################
+					if "cmc" in card:
+						getCMC(card["cmc"]);
+					else:
+						print("NO CONVERTED MANACOST, GIVING CMC OF 0");
+					##############
+					###manacost###
+					##############	
+					if "manaCost" in card:
+						getManaCharacteristics(card["manaCost"]);
+					else:
+						print("NO MANACOST FOUND");
 				else:
 					if(price == -1):
 						print(card["name"].encode('utf-8') + " was not found in " + fileName);
@@ -64,6 +69,8 @@ def main():
 						print(card["name"].encode('utf-8') + " had a 0$ price   " + fileName);
 		else:
 			print("ERROR, "+setCode+" does not exist in bigFile");
+
+
 
 
 def getCardPrice(cardName, cardPrices):
@@ -95,26 +102,52 @@ def getCardPrice(cardName, cardPrices):
 
 def getNGramCount(cardName, cardPrice, originalText, setName):
 	#subfunction
-	def upToNGram(pos):
+	def upToNGram(sent):
 		temp = "";
-
-		for i in range(pos, min(pos+numGram, len(words))): #upper bound is the smallest between (pos+numgram) OR the last word in the sentence.
-			temp += words[i] + " ";
-			print(temp);
+		numWords = numGram;
+		for x in range(0, len(sent)):
+			temp+=sent[x]+" ";
 			nGramDict.setdefault(temp[:-1],[]).append(cardPrice);
+			numWords-=1;
+			if(numWords==0):
+				break;
 	#Example for numGram = 3
 	#for each SENTENCE in the description, do 1 gram;2 gram;3gram on the first 1,2 and 3 words
 	#then do 3 gram for the rest of the sentence (do not do 2gram and 1 gram on the last 2 and 1 words)
 	numGram = 3;
-	words = re.split("[ \n]", originalText);
-	print(words);
-	temp = "";
-	upToNGram(0);
-	for i in range(1,len(words)-numGram):
-		temp = "";
-		for j in range(i, i+numGram):
-			temp+=words[j]+" ";
-		nGramDict.setdefault(temp[:-1],[]).append(cardPrice); #pass in temp with last letter removed (space)
+	originalText = originalText.replace(cardName, "this");
+
+	#seperate into sentences and words
+	wordSeperators = [' ', '\n'];	
+	sentenceSeperators = ['.','(',')'];
+	removeTheseFromFront = [' ','\n','\t'];
+
+	word="";
+	sentence = [];
+	sentences = [];
+	for i in range(0,len(originalText)):
+		if(originalText[i] in wordSeperators and word != ""):
+			sentence.append(word);
+			word="";
+		elif(originalText[i] in sentenceSeperators):
+			if(word not in wordSeperators and word != ""):
+				sentence.append(word);
+				#print(sentence);
+				sentences.append(sentence);
+				sentence = [];
+			word="";
+		else:
+			word+=originalText[i];
+
+	for i in range(0,len(sentences)): #for each sentence
+		upToNGram(sentences[i]);
+		for j in range(1,len(sentences[i])-numGram+1): #for each word in the sentence starting at word number 2 (we already dealt with all instances of 1st word in upToNGram())
+			temp="";
+			for k in range(0,numGram): #get the next 3 words
+				temp+=sentences[i][j+k]+" ";
+			nGramDict.setdefault(temp[:-1],[]).append(cardPrice);
+	with open("ngramCount"+".json", 'w') as fp:
+		json.dump(nGramDict, fp);
 
 def getCMC(cmc):
 	print("do the cmc thing");
@@ -124,6 +157,3 @@ def getManaCharacteristics(manaCost):
 
 if __name__ == "__main__":
 	main();
-
-
-#{T}{1}{B}: creature name gains flying until the end of the turn.
