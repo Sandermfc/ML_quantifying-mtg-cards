@@ -13,7 +13,9 @@ def main():
 
 
 	key_prices = dict(parse_keywords(data, keywords))
-	getPrices(key_prices)
+
+	with open("Price-Per-Ability.json", 'w') as file3:
+		json.dump(getPrices(key_prices), file3)
 
 def getPrices(abilities):
 
@@ -35,7 +37,7 @@ def getPrices(abilities):
 		for key, value in prices.items():
 			ppa.setdefault(value[0][0],[]).append(value[1]);
 		print('Unique abilities', len(ppa))
-		return prices
+		return ppa
 
 def parse_keywords(data, keywords):
 	sets = {};
