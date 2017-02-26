@@ -6,38 +6,37 @@ def main():
 	#open the big json file containing our dataset, I'll refer to this as bigFile from here on out
 	with open("AllSets-x.json") as file1:
 		data = json.load(file1)
-	keywords = {}; #Create a dictionnary containing all the keyword abilities.
+	keywords = {};
+	#Create a dictionnary containing all the keyword abilities.
 	with open('keywords.txt', 'r') as file2:
 		for line in file2:
 			keywords[line.strip('\n')] = 0;
 
-
-	key_prices = dict(parse_keywords(data, keywords))
-
+	#Get the dictionnary of single keywords by card name.
+	key_abilities = dict(parse_keywords(data, keywords))
+	#Write a JSON file that contains the prices of each ability.
 	with open("Price-Per-Ability.json", 'w') as file3:
-		json.dump(getPrices(key_prices), file3)
+		json.dump(getPrices(key_abilities), file3)
 
 def getPrices(abilities):
+	prices = {}
+	#for each file which has price data
+	for fileName in os.listdir('price-by-set'):
+		#substring the fileName to get setName
+		pos = fileName.find('_');
+		setName = fileName[pos+1:len(fileName)-5];
 
-		prices = {}
-		#for each file which has price data
-		for fileName in os.listdir('price-by-set'):
-			#substring the fileName to get setName
-			pos = fileName.find('_');
-			setName = fileName[pos+1:len(fileName)-5];
-
-			#open the file
-			with open("price-by-set/"+fileName) as file2:
-				cardPrices = json.load(file2);
-			for key, value in abilities.items():
-				if key in cardPrices:
-					prices[key] = (value, cardPrices[key][0])
-
-		ppa = {}
-		for key, value in prices.items():
-			ppa.setdefault(value[0][0],[]).append(value[1]);
-		print('Unique abilities', len(ppa))
-		return ppa
+		#open the file
+		with open("price-by-set/"+fileName) as file2:
+			cardPrices = json.load(file2);
+		for key, value in abilities.items():
+			if key in cardPrices:
+				prices[key] = (value, cardPrices[key][0])
+	ppa = {} #Price Per Ability
+	for key, value in prices.items():
+		ppa.setdefault(value[0][0],[]).append(value[1]);
+	print('Unique abilities', len(ppa))
+	return ppa
 
 def parse_keywords(data, keywords):
 	sets = {};
@@ -46,8 +45,6 @@ def parse_keywords(data, keywords):
 		sets[(data[setN]["name"].encode('utf-8'))] = setN;
 	#open a text file to write stuff
 	writeF = open('abilities.txt', 'w');
-
-
 
 	OT = {};  #Dictionnary of originalText : Key = card name, value = originalText
 	for key, value in sets.items():
@@ -62,6 +59,7 @@ def parse_keywords(data, keywords):
 	#key = card name, value = ability
 	key_abilities = dict(OT);
 	other_abilities = dict(OT);
+	
 	#Now we divid OT in two dictionnaries : keyword abilities and other abilities.
 	for key, value in OT.items():
 		if value.split()[0] not in keywords:
@@ -71,15 +69,14 @@ def parse_keywords(data, keywords):
 				del other_abilities[key];
 			else:
 				del key_abilities[key];
+
 	#Remove stuff that isn't keyword abilities
 	for key, value in key_abilities.items():
-		if value.find('{') != -1:
-			key_abilities[key] = remove_brackets(key_abilities[key])
-		if value.find('and/or') != -1:
-			key_abilities[key] = key_abilities[key].replace('and/or', '')
-		if value.find('(') != -1:
-			key_abilities[key] = remove_parentheses(key_abilities[key])
+		key_abilities[key] = remove_brackets(key_abilities[key])
+		key_abilities[key] = key_abilities[key].replace('and/or', '')
+		key_abilities[key] = remove_parentheses(key_abilities[key])
 		key_abilities[key] = remove_numbers(key_abilities[key])
+
 	#Divide key_abilities in one word abilities and multiple word abilities.
 	one_word = dict(key_abilities)
 	more_word = dict(key_abilities)
@@ -93,19 +90,13 @@ def parse_keywords(data, keywords):
 
 
 	#Printing factory
-	#for key, value in more_word.items():
-		#print(list(filter(None, value)))
 	print('One word', len(one_word))
 	print('More word', len(more_word))
 	print("Keywords", len(key_abilities))
 	print("Other", len(other_abilities))
 	print("Total", len(OT))
-	for key, value in key_abilities.items():
-		#print(key, value)
-		writeF.write(value + '\n\n')
 
 	return one_word
-
 
 
 def remove_parentheses(s):
