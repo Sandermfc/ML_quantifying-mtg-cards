@@ -3,6 +3,16 @@ import json
 import re #regular expressions
 
 nGramDict = {};
+keyword = {};
+description = {};
+cmc = {};
+numOfColors = {};
+dictPower = {};
+dictToughness = {};
+dictRarity = {};
+numOfReprints = {};
+
+
 
 def main():
 	#open the big json file containing our dataset, I'll refer to this as bigFile from here on out
@@ -23,20 +33,31 @@ def main():
 		#substring the fileName to get setName
 		pos = fileName.find('_');
 		setName = fileName[pos+1:len(fileName)-5];
-
+		print("Doing set "+setName);
 		#if setCode exists in bigFile
 		if setCode[setName] in data:
-			###############################################
-			###DO STUFF TO SCRAPE INFO FROM THE SET HERE###
-			###############################################
+
+			
+			#############################################################
+			###DO STUFF TO SCRAPE INFO FROM THE SET HERE (if you want)###
+			#############################################################
+			tempDescription = {};
+			tempCmc = {};
+			tempNumOfColors = {};
+			tempPower = {};
+			tempToughness = {};
+			tempRarity = {};
+			tempNumberOfPrintings = {};
 			#for each card in the set
 			for card in data[setCode[setName]]["cards"]:
 				###########
 				###PRICE###
 				###########
-				price = getCardPrice(card["name"], cardPrices);
+				cardName = card["name"].encode('utf-8');
+				price = getCardPrice(cardName, cardPrices);
+				print(price);
 				if(price > 0):
-					print(price);
+					#print(price);
 					########################################################
 					###DO STUFF TO SCRAPE INFO FROM INDIVIDUAL CARDS HERE###
 					########################################################
@@ -44,41 +65,102 @@ def main():
 					###DESCRIPTION###
 					#################
 					if "originalText" in card:
-						#print(card["originalText"].encode('utf-8'));
-						getNGramCount(card["name"].encode('utf-8'), price, card["originalText"].encode('utf-8'), setName);
-					else:
-						print("NO ORIGINAL TEXT, GIVING VALUE OF 0");
+						tempDescription[cardName.encode('utf-8')] = getDescription(card["name"].encode('utf-8'), price, card["originalText"].encode('utf-8'), setName);
+					#else:
+					#	print("NO ORIGINAL TEXT, GIVING VALUE OF 0");
 					########################
-					###Converted manacost###
+					###CONVERTED MANACOST###
 					########################
 					if "cmc" in card:
-						getCMC(card["cmc"]);
-					else:
-						print("NO CONVERTED MANACOST, GIVING CMC OF 0");
+						#getCMC(cardName, card["cmc"]);
+						tempCmc[cardName.encode('utf-8')] = card["cmc"];
+					#else:
+					#	print("NO CONVERTED MANACOST, GIVING CMC OF 0");
 					##############
-					###manacost###
+					###MANACOST###
 					##############	
-					if "manaCost" in card:
-						getManaCharacteristics(card["manaCost"]);
-					else:
-						print("NO MANACOST FOUND");
-				else:
-					if(price == -1):
-						print(card["name"].encode('utf-8') + " was not found in " + fileName);
-					elif(price == -2):
-						print(card["name"].encode('utf-8') + " had a 0$ price   " + fileName);
+					if "colorIdentity" in card:
+						tempNumOfColors[cardName] = len(card["colorIdentity"]);
+						#getNumOfColors(cardName, card["colorIdentity"]);
+					#else:
+					#	print("NO MANACOST FOUND");
+					###########
+					###POWER###
+					###########
+					if "power" in card:
+						tempPower[cardName] = card["power"];
+						#getPower(cardName, card["power"]);
+					#else:
+					#	print("NO POWER");
+					###############
+					###TOUGHNESS###
+					###############
+					if "toughness" in card:
+						tempToughness[cardName] = card["toughness"];
+						#getToughness(cardName, card["toughness"]);
+					#else:
+					#	print("NO TOUGHNESS");
+					############
+					###RARITY###
+					############
+					if "rarity" in card:
+						tempRarity[cardName] = getRarity(card["rarity"]);
+					#else:
+					#	print("NO RARITY");
+					########################
+					###NUMBER OF REPRINTS###
+					########################
+					if "printings" in card:
+						tempNumberOfPrintings[cardName] = len(card["printings"]);
+						#getNumberOfPrintings(cardName, card["printings"]);
+					#else:
+					#	print("NO PRINTINGS/NO REPRINTS?");
+				#else:
+				#	if(price == -1):
+				#		print(card["name"].encode('utf-8') + " was not found in " + fileName);
+				#	elif(price == -2):
+				#		print(card["name"].encode('utf-8') + " had a 0$ price   " + fileName);
+			##############################################
+			#####Save all dictionnaries to json files#####
+			##############################################
+			description[setCode[setName]] = tempDescription;
+			cmc[setCode[setName]] = tempCmc;
+			numOfColors[setCode[setName]] = tempNumOfColors;
+			dictPower[setCode[setName]] = tempPower;
+			dictToughness[setCode[setName]] = tempToughness;
+			dictRarity[setCode[setName]] = tempRarity;
+			numOfReprints[setCode[setName]] = tempNumberOfPrintings;
 		else:
 			print("ERROR, "+setCode+" does not exist in bigFile");
 
+	print("nGramDict size = "+str(len(nGramDict)));
+	print("cmc = "+str(len(cmc)));
 
-
+	with open("ngramCount"+".json", 'w') as fp:
+		json.dump(nGramDict, fp);
+	with open("keywords"+".json", 'w') as fp:
+		json.dump(keyword, fp);
+	with open("descriptions"+".json", 'w') as fp:
+		json.dump(description, fp);
+	with open("cmc"+".json", 'w') as fp:
+		json.dump(cmc, fp);
+	with open("numOfColors"+".json", 'w') as fp:
+		json.dump(numOfColors, fp);
+	with open("power"+".json", 'w') as fp:
+		json.dump(dictPower, fp);
+	with open("toughness"+".json", 'w') as fp:
+		json.dump(dictToughness, fp);
+	with open("rarity"+".json", 'w') as fp:
+		json.dump(dictRarity, fp);
+	with open("numOfReprints"+".json", 'w') as fp:
+		json.dump(numOfReprints, fp);
 
 def getCardPrice(cardName, cardPrices):
 	#-1 for "card not found"
 	#-2 for value = 0;
 	if cardName in cardPrices:
 		if(cardPrices[cardName][0] != 0):
-			return cardPrices[cardName][0];
+			return cardPrices[cardName][0][1:];
 		else:
 			return -2;
 	elif cardName + " (1)" in cardPrices: #check for syntax of alternate artworks
@@ -96,9 +178,15 @@ def getCardPrice(cardName, cardPrices):
 		else:
 			return -2;
 		#print(finalPrice);
-		return finalPrice;
+		return finalPrice[1:];
 	else:
 		return -1;
+
+def getDescription(cardName, cardPrice, originalText, setName):
+	originalText = originalText.replace(cardName, "this").lower();
+	#originalText = jeansFunction();
+	getNGramCount(cardName,cardPrice,originalText, setName);
+	return originalText;
 
 def getNGramCount(cardName, cardPrice, originalText, setName):
 	#subfunction
@@ -115,11 +203,10 @@ def getNGramCount(cardName, cardPrice, originalText, setName):
 	#for each SENTENCE in the description, do 1 gram;2 gram;3gram on the first 1,2 and 3 words
 	#then do 3 gram for the rest of the sentence (do not do 2gram and 1 gram on the last 2 and 1 words)
 	numGram = 3;
-	originalText = originalText.replace(cardName, "this");
 
 	#seperate into sentences and words
 	wordSeperators = [' ', '\n'];	
-	sentenceSeperators = ['.','(',')'];
+	sentenceSeperators = ['.','(',')',','];
 	removeTheseFromFront = [' ','\n','\t'];
 
 	word="";
@@ -146,14 +233,38 @@ def getNGramCount(cardName, cardPrice, originalText, setName):
 			for k in range(0,numGram): #get the next 3 words
 				temp+=sentences[i][j+k]+" ";
 			nGramDict.setdefault(temp[:-1],[]).append(cardPrice);
-	with open("ngramCount"+".json", 'w') as fp:
-		json.dump(nGramDict, fp);
 
-def getCMC(cmc):
-	print("do the cmc thing");
+def getCMC(cardName, cmcVal):
+	cmc[cardName.encode('utf-8')] = cmcVal;
+	#print("cmc " +str(cmc[cardName.encode('utf-8')]));
 
-def getManaCharacteristics(manaCost):
-	print("do the mana thing");
+def getNumOfColors(cardName, colorIdentity):
+	numOfColors[cardName.encode('utf-8')] = len(colorIdentity);
+	#print("numOfColors "+str(numOfColors[cardName.encode('utf-8')]));
+
+def getPower(cardName, powerVal):
+	dictPower[cardName.encode('utf-8')] = powerVal;
+	#print("power "+str(dictPower[cardName.encode('utf-8')]));
+def getToughness(cardName, toughnessVal):
+	dictToughness[cardName.encode('utf-8')] = toughnessVal;
+	#print("toughness "+str(dictToughness[cardName.encode('utf-8')]));
+
+def getRarity(rarityVal):
+	if(rarityVal == "Common"):
+		return 2;
+	elif(rarityVal == "Uncommon"):
+		return 4;
+	elif(rarityVal == "Rare"):
+		return 8;
+	elif(rarityVal == "Mythic Rare"):
+		return 16;
+	else:
+		return 1;
+	#print("rarity "+str(dictRarity[cardName.encode('utf-8')]));
+
+def getNumberOfPrintings(cardName, printings):
+	numOfReprints[cardName.encode('utf-8')] = len(printings);
+	#print("reprints "+str(numOfReprints[cardName.encode('utf-8')]));
 
 if __name__ == "__main__":
 	main();
