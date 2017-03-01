@@ -14,14 +14,23 @@ def main():
 		for line in file2:
 			keywords[line.strip('\n')] = 0;
 
-	extract_keywords(data)
+	#Extract keywords returns a tuple. [0]: keyword abilities [1]: Descritpions
+	card_keywords = {}
+	card_descritpions = {}
+	kd = []
+	kd = extract_keywords(data)
+	card_keywords = kd[0]
+	card_descritpions = kd[1]
 
 
 def extract_keywords(data):
 	#Get the dictionnary of keywords by card name.
-	key_abilities = make_keyword_arrays(only_keywords(dict(get_data(data, 0))))
-	paragraph2 = make_keyword_arrays(only_keywords(dict(get_data(data, 1))))
-	paragraph3 = make_keyword_arrays(only_keywords(dict(get_data(data, 2))))
+	both = make_keyword_arrays(only_keywords(dict(get_data(data, 0))))
+	key_abilities = both[0]
+	descriptions = both[1]
+	paragraph2 = make_keyword_arrays(only_keywords(dict(get_data(data, 1))))[0]
+	paragraph3 = make_keyword_arrays(only_keywords(dict(get_data(data, 2))))[0]
+
 	all_keywords = key_abilities
 	print("Key_abilities",len(key_abilities))
 
@@ -58,7 +67,10 @@ def extract_keywords(data):
 	with open("keywords.json", 'w') as file3:
 		json.dump(all_keywords, file3)
 
-	return all_keywords
+	with open("descriptions.json", 'w') as file4:
+		json.dump(descriptions, file4)
+
+	return [all_keywords, descriptions]
 
 def get_data(data, paragraph):
 	sets = {};
@@ -132,9 +144,11 @@ def make_keyword_arrays(keyword_list):
 			del more_words[key]
 			one_word[key] = list(filter(None, one_word[key]))
 
+	descriptions = {}
 	#This will remove non-keyword stuff.
 	for key, value in more_words.items():
-		more_words[key] = clean_array(value)
+		more_words[key] = clean_array(value)[0]
+		descriptions[key] = clean_array(value)[1]
 
 	#Put everything together.
 	all_abilities = dict(one_word.items() + more_words.items())
@@ -143,24 +157,24 @@ def make_keyword_arrays(keyword_list):
 	# print('More words', len(more_words))
 	# print("Keywords", len(keyword_list))
 	# print("All", len(all_abilities))
-
-
-	return all_abilities
+	return [all_abilities, descriptions]
 
 
 #This function will return an array containing only keyword abilities. TO DO: add something that accepts Flying and flying.
 #Also add a way to make multiple word abilities just one element in the array.
 def clean_array(arr):
 	cleaned = []
+	description = []
 	for i in range(0, len(arr)):
 		if arr[i].title() in keywords:
 			cleaned.append(arr[i])
 		else:
+			description = ' '.join([arr[k] for k in range(i, len(arr))])
 			break
 	if len(cleaned) > 0:
-		return cleaned
+		return [cleaned, description]
 	else:
-		return arr
+		return [arr, description]
 
 #Devides a string at every capital letter.
 def cDiv(s):
