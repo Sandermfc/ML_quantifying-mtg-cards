@@ -6,7 +6,7 @@ import operator
 def clean_desc(description, keywords):
 	#Get 3 first paragraphes
 	para1 = description.splitlines()[0]
-
+	newDesc = ""
 	#Remove stuff that isn't keyword abilities
 	para1 = remove_parentheses(para1)
 	para1 = remove_brackets(para1)
@@ -15,8 +15,8 @@ def clean_desc(description, keywords):
 	para1 = cDiv(para1)
 	para1 = clean_array(para1, keywords)
 	kw = list(para1[0])
-	newDesc = para1[1]
-
+	if len(para1[1]) > 0:
+		newDesc = str(para1[1])
 	if len(description.splitlines()) > 1:
 		para2 = description.splitlines()[1]
 		para2 = remove_parentheses(para2)
@@ -26,7 +26,8 @@ def clean_desc(description, keywords):
 		para2 = cDiv(para2)
 		para2 = clean_array(para2, keywords)
 		kw = kw + list(para2[0])
-		newDesc = newDesc + " " + para2[1]
+		if len(para2[1]) > 0:
+			newDesc = newDesc + " " + para2[1]
 
 	if len(description.splitlines()) > 2:
 		para3 = description.splitlines()[2]
@@ -37,7 +38,8 @@ def clean_desc(description, keywords):
 		para3 = cDiv(para3)
 		para3 = clean_array(para3, keywords)
 		kw = kw + list(para3[0])
-		newDesc = newDesc + " " + para3[1]
+		if len(para3[1]) > 0:
+			newDesc = newDesc + " " + para3[1]
 
 
 	return [kw, newDesc]
