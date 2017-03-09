@@ -54,7 +54,7 @@ def clean_array(arr, keywords):
 			break
 		if arr[i].title() in keywords:
 			cleaned.append(keywords[arr[i].title()])
-			if len(keywords[arr[i].title()].split(' ')) > 1:
+			if len(keywords[arr[i].title()].split(' ')) > 1 and (i+2 < len(arr)):
 				arr.remove(arr[i+1])
 		else:
 			description = ' '.join([arr[k] for k in range(i, len(arr))])
