@@ -3,24 +3,21 @@ import json
 import re
 import operator
 
-keywords = {}
-
-def clean_desc(description, kw):
-	keywords = kw
+def clean_desc(description, keywords):
 	#Remove stuff that isn't keyword abilities
 	description = remove_parentheses(description)
 	description = remove_brackets(description)
 	description = remove_char(description)
 	description = description.replace('and/or', '')
 	description = cDiv(description)
-	description = clean_array(description)
+	description = clean_array(description, keywords)
 	kw = description[0]
 	newDesc = description[1]
 	return [kw, newDesc]
 
 #This function will return an array containing only keyword abilities. TO DO: add something that accepts Flying and flying.
 #Also add a way to make multiple word abilities just one element in the array.
-def clean_array(arr):
+def clean_array(arr, keywords):
 	cleaned = []
 	description = []
 	for i in range(0, len(arr)):
