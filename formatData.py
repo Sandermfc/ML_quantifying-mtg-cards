@@ -16,7 +16,6 @@ dictRarity = {};
 numOfReprints = {};
 releaseDateDict = {}
 
-
 def main():
 	#open the big json file containing our dataset, I'll refer to this as bigFile from here on out
 	with open("AllSets-x.json") as file1:
@@ -236,8 +235,7 @@ def getNGramCount(cardName, cardPrice, originalText, setName):
 
 	#seperate into sentences and words
 	wordSeperators = [' ', '\n'];	
-	sentenceSeperators = ['.','(',')',','];
-	removeTheseFromFront = [' ','\n','\t'];
+	sentenceSeperators = ['.','(',')',',',';'];
 
 	word="";
 	sentence = [];
@@ -264,21 +262,6 @@ def getNGramCount(cardName, cardPrice, originalText, setName):
 				temp+=sentences[i][j+k]+" ";
 			nGramDict.setdefault(temp.strip(),[]).append(cardPrice);
 
-def getCMC(cardName, cmcVal):
-	cmc[cardName.encode('utf-8')] = cmcVal;
-	#print("cmc " +str(cmc[cardName.encode('utf-8')]));
-
-def getNumOfColors(cardName, colorIdentity):
-	numOfColors[cardName.encode('utf-8')] = len(colorIdentity);
-	#print("numOfColors "+str(numOfColors[cardName.encode('utf-8')]));
-
-def getPower(cardName, powerVal):
-	dictPower[cardName.encode('utf-8')] = powerVal;
-	#print("power "+str(dictPower[cardName.encode('utf-8')]));
-def getToughness(cardName, toughnessVal):
-	dictToughness[cardName.encode('utf-8')] = toughnessVal;
-	#print("toughness "+str(dictToughness[cardName.encode('utf-8')]));
-
 def getRarity(rarityVal):
 	if(rarityVal == "Common"):
 		#print("Common");
@@ -295,10 +278,6 @@ def getRarity(rarityVal):
 	else:
 		return "Nothing";
 	#print("rarity "+str(dictRarity[cardName.encode('utf-8')]));
-
-def getNumberOfPrintings(cardName, printings):
-	numOfReprints[cardName.encode('utf-8')] = len(printings);
-	#print("reprints "+str(numOfReprints[cardName.encode('utf-8')]));
 
 if __name__ == "__main__":
 	main();
