@@ -5,19 +5,8 @@ import operator
 
 keywords = {}
 
-def main():
-
-	#Create a dictionnary containing all the unique keyword abilities.
-	with open('keywords2.txt', 'r') as file2:
-		for line in file2:
-			keywords[line.strip('\n').split(' ')[0]] = line.strip('\n');
-
-	#Extract keywords returns a tuple. [0]: keyword abilities [1]: Descritpions
-	test1 = "FlyingOnly description pasiss"
-	print(clean_desc(test1))
-
-
-def clean_desc(description):
+def clean_desc(description, kw):
+	keywords = kw
 	#Remove stuff that isn't keyword abilities
 	description = remove_parentheses(description)
 	description = remove_brackets(description)
@@ -75,6 +64,3 @@ def remove_char(s):
 		if not s[i].isalpha():
 			s = s.replace(s[i], ' ')
 	return s
-
-if __name__ == "__main__":
-	main();
