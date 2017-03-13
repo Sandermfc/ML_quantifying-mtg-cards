@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 settings = tf.app.flags
 SETTINGS = settings.FLAGS
 settings.DEFINE_float('alpha', 0.1, 'Initial learning rate.')
-settings.DEFINE_integer('max_steps', 1000000, 'Number of steps to run trainer.')
-settings.DEFINE_integer('display_step', 10000, 'Display logs per step.')
+settings.DEFINE_integer('max_steps', 100000, 'Number of steps to run trainer.')
+settings.DEFINE_integer('display_step', 1000, 'Display logs per step.')
 
 ngramin = {}
 
@@ -48,45 +48,44 @@ def getNGramNum(originalText):
 			if(numWords==0):
 				break;
 		return temp1
-	#Example for numGram = 3
-	#for each SENTENCE in the description, do 1 gram;2 gram;3gram on the first 1,2 and 3 words
-	#then do 3 gram for the rest of the sentence (do not do 2gram and 1 gram on the last 2 and 1 words)
-	numGram = 3;
+	with open("parsedData/ngramVal.json", "r") as file1:
+		ngramin = json.load(file1)
 
-	#seperate into sentences and words
-	wordSeperators = [' ', '\n'];	
-	sentenceSeperators = ['.','(',')',','];
-	removeTheseFromFront = [' ','\n','\t'];
+		numGram = 3;
 
-	word="";
-	sentence = [];
-	sentences = [];
-	for i in range(0,len(originalText)):
-		if(originalText[i] in wordSeperators and word != ""):
-			sentence.append(word);
-			word="";
-		elif(originalText[i] in sentenceSeperators):
-			if(word not in wordSeperators and word != ""):
+		#seperate into sentences and words
+		wordSeperators = [' ', '\n'];	
+		sentenceSeperators = ['.','(',')',','];
+		removeTheseFromFront = [' ','\n','\t'];
+
+		word="";
+		sentence = [];
+		sentences = [];
+		for i in range(0,len(originalText)):
+			if(originalText[i] in wordSeperators and word != ""):
 				sentence.append(word);
-				#print(sentence);
-				sentences.append(sentence);
-				sentence = [];
-			word="";
-		else:
-			word+=originalText[i];
-	ngramcount = 0.0
-	for i in range(0,len(sentences)): #for each sentence
-		temp1 = getNGramNum2(sentences[i]);
-		counter = 3
-		for j in range(1,len(sentences[i])-numGram+1): #for each word in the sentence starting at word number 2 (we already dealt with all instances of 1st word in upToNGram())
-			temp="";
-			for k in range(0,numGram): #get the next 3 words
-				temp+=sentences[i][j+k]+" ";
-			if( temp.strip().encode("utf-8") in ngramin):
-				temp1 = temp1 + ngramin[temp.strip().encode("utf-8")]
-			counter = counter + 1
-		ngramcount += temp1 / counter
-	return ngramcount
+				word="";
+			elif(originalText[i] in sentenceSeperators):
+				if(word not in wordSeperators and word != ""):
+					sentence.append(word);
+					sentences.append(sentence);
+					sentence = [];
+				word="";
+			else:
+				word+=originalText[i];
+		ngramcount = 0.0
+		for i in range(0,len(sentences)): #for each sentence
+			temp1 = getNGramNum2(sentences[i])
+			counter = min(3, len(sentences[i]))
+			for j in range(1,len(sentences[i])-numGram+1): #for each word in the sentence starting at word number 2 (we already dealt with all instances of 1st word in upToNGram())
+				temp="";
+				for k in range(0,numGram): #get the next 3 words
+					temp+=sentences[i][j+k]+" ";
+				if( temp.strip().encode("utf-8") in ngramin):
+					temp1 = temp1 + ngramin[temp.strip().encode("utf-8")]
+				counter = counter + 1
+			ngramcount += temp1 / counter
+		return ngramcount
 
 
 #change the description to value
@@ -345,17 +344,12 @@ def normalize(train_X):
 import sys
 
 def main():
-	#rarityChange()
-	#getNGramCount()
-	#separateInputs()
-	#[X, Y] = read_data("splitData/learningData.csv")
-	#X = normalize(X)
-	#run_training(X, Y)
-
-	#temp = "if this attacks and is blocked, you may choose to have it deal its damage to the defending player instead of to the creatures blocking it."
-	temp  = "graveyard other than"
-	originalText = getNGramNum(temp)
-	print originalText
+	rarityChange()
+	getNGramCount()
+	separateInputs()
+	[X, Y] = read_data("splitData/learningData.csv")
+	X = normalize(X)
+	run_training(X, Y)
 
 	print("main")
 
