@@ -2,11 +2,12 @@ import os
 import json
 import re #regular expressions
 import datetime
+import splitdesc as sd
 
 nGramDict = {};
 nGramVal = {};
 
-keyword = {};
+keywordsDict = {};
 description = {};
 cmc = {};
 numOfColors = {};
@@ -14,25 +15,31 @@ dictPower = {};
 dictToughness = {};
 dictRarity = {};
 numOfReprints = {};
-releaseDateDict = {}
+releaseDateDict = {};
+
+priceDict = {};
 
 def main():
 	#open the big json file containing our dataset, I'll refer to this as bigFile from here on out
 	with open("AllSets-x.json") as file1:
 		data = json.load(file1);
-
+		file1.close();
+	with open("Keywords-Dict.json", 'r') as fp:
+		KeywordsDict = json.load(fp);
 	#create a conversion table from setName to setCode (setCode is the format used in AllSets-x.json)
 	setCode = {};
 	for set in data:
 		setCode[data[set]["name"].encode('utf-8')] = set;
 	with open("setCodes.json", 'w') as fp:
 		json.dump(setCode, fp);
+		fp.close();
 
 	#for each file which has price data
 	for fileName in os.listdir('price-by-set'):
 		#open the file
 		with open("price-by-set/"+fileName) as file2:
 			cardPrices = json.load(file2);
+			file2.close();
 
 		#substring the fileName to get setName
 		pos = fileName.find('_');
@@ -49,6 +56,7 @@ def main():
 			#############################################################
 			###DO STUFF TO SCRAPE INFO FROM THE SET HERE (if you want)###
 			#############################################################
+			tempKeywordsDict = {};
 			tempDescription = {};
 			tempCmc = {};
 			tempNumOfColors = {};
@@ -57,6 +65,7 @@ def main():
 			tempRarity = {};
 			tempNumberOfPrintings = {};
 			tempReleaseDate = {};
+			tempPriceDict = {};
 			#for each card in the set
 			for card in data[setCode[setName]]["cards"]:
 				###########
@@ -72,7 +81,9 @@ def main():
 					###DESCRIPTION###
 					#################
 					if "originalText" in card:
-						tempDescription[cardName.encode('utf-8')] = getDescription(card["name"].encode('utf-8'), price, card["originalText"].encode('utf-8'), setName);
+						g = getDescription(card["name"].encode('utf-8'), price, card["originalText"].encode('utf-8'), setName, KeywordsDict);
+						tempKeywordsDict[cardName.encode('utf-8')] = g[0];
+						tempDescription[cardName.encode('utf-8')] = g[1];
 					else:
 						tempDescription[cardName] = "";
 					########################
@@ -95,7 +106,7 @@ def main():
 					###POWER###
 					###########
 					if "power" in card:
-						tempPower[cardName] = card["power"];
+						tempPower[cardName] = getPt(card["power"]);
 						#getPower(cardName, card["power"]);
 					else:
 						tempPower[cardName] = 0;
@@ -103,7 +114,7 @@ def main():
 					###TOUGHNESS###
 					###############
 					if "toughness" in card:
-						tempToughness[cardName] = card["toughness"];
+						tempToughness[cardName] = getPt(card["toughness"]);
 						#getToughness(cardName, card["toughness"]);
 					else:
 						tempToughness[cardName] = 0;
@@ -126,6 +137,7 @@ def main():
 					###RELEASE DATE###
 					##################
 					tempReleaseDate[cardName] = releaseDateInt;
+					tempPriceDict[cardName] = price;
 				#else:
 				#	if(price == -1):
 				#		print(card["name"].encode('utf-8') + " was not found in " + fileName);
@@ -135,6 +147,7 @@ def main():
 			#####Save all dictionnaries to json files#####
 			##############################################
 			description[setCode[setName]] = tempDescription;
+			keywordsDict[setCode[setName]] = tempKeywordsDict;
 			cmc[setCode[setName]] = tempCmc;
 			numOfColors[setCode[setName]] = tempNumOfColors;
 			dictPower[setCode[setName]] = tempPower;
@@ -142,9 +155,12 @@ def main():
 			dictRarity[setCode[setName]] = tempRarity;
 			numOfReprints[setCode[setName]] = tempNumberOfPrintings;
 			releaseDateDict[setCode[setName]] = tempReleaseDate;
+			priceDict[setCode[setName]] = tempPriceDict;
 		else:
 			print("ERROR, "+setCode+" does not exist in bigFile");
 
+
+	print("parsedData/ammount of ngram's = "+str(len(nGramDict)));
 	#Heavily weighted average
 	for ngram in nGramDict:
 		minOccurences = 5;
@@ -157,30 +173,44 @@ def main():
 			for k in range(0, len(priceList)):
 				val = val + float(priceList[k].encode('utf-8'));
 			val/=len(priceList);
-			print(ngram + " --> "+str(val));
+			#print(ngram + " --> "+str(val));
 			nGramVal[ngram] = val;
 			
 	print("parsedData/ammount of ngram's = "+str(len(nGramVal)));
-	with open("parsedData/ngramCount"+".json", 'w') as fp:
-		json.dump(nGramDict, fp);
-	with open("parsedData/keywords"+".json", 'w') as fp:
-		json.dump(keyword, fp);
+
+	with open("parsedData/ngramVal"+".json", 'w') as fp:
+		json.dump(nGramVal, fp);
+		fp.close();
 	with open("parsedData/descriptions"+".json", 'w') as fp:
 		json.dump(description, fp);
+		fp.close();
+	with open("parsedData/keywords"+".json", 'w') as fp:
+		json.dump(keywordsDict, fp);
+		fp.close();
 	with open("parsedData/cmc"+".json", 'w') as fp:
 		json.dump(cmc, fp);
+		fp.close();
 	with open("parsedData/numOfColors"+".json", 'w') as fp:
 		json.dump(numOfColors, fp);
+		fp.close();
 	with open("parsedData/power"+".json", 'w') as fp:
 		json.dump(dictPower, fp);
+		fp.close();
 	with open("parsedData/toughness"+".json", 'w') as fp:
 		json.dump(dictToughness, fp);
+		fp.close();
 	with open("parsedData/rarity"+".json", 'w') as fp:
 		json.dump(dictRarity, fp);
+		fp.close();
 	with open("parsedData/numOfReprints"+".json", 'w') as fp:
 		json.dump(numOfReprints, fp);
+		fp.close();
 	with open("parsedData/releaseDate"+".json",'w') as fp:
 		json.dump(releaseDateDict, fp);
+		fp.close();
+	with open("parsedData/price"+".json",'w') as fp:
+		json.dump(priceDict, fp);
+		fp.close();
 
 
 def getCardPrice(cardName, cardPrices):
@@ -210,12 +240,14 @@ def getCardPrice(cardName, cardPrices):
 	else:
 		return -1;
 
-def getDescription(cardName, cardPrice, originalText, setName):
+def getDescription(cardName, cardPrice, originalText, setName, KeywordsDict):
+
 	originalText = originalText.replace(cardName, "this");
-	#originalText = jeansFunction();
-	originalText = originalText.lower();
-	getNGramCount(cardName,cardPrice,originalText, setName);
-	return originalText;
+	description = "";
+	g = sd.clean_desc(originalText, KeywordsDict);
+	description = g[1].lower();
+	getNGramCount(cardName, cardPrice, description, setName);
+	return g;
 
 def getNGramCount(cardName, cardPrice, originalText, setName):
 	#subfunction
@@ -232,7 +264,6 @@ def getNGramCount(cardName, cardPrice, originalText, setName):
 	#for each SENTENCE in the description, do 1 gram;2 gram;3gram on the first 1,2 and 3 words
 	#then do 3 gram for the rest of the sentence (do not do 2gram and 1 gram on the last 2 and 1 words)
 	numGram = 3;
-
 	#seperate into sentences and words
 	wordSeperators = [' ', '\n'];	
 	sentenceSeperators = ['.','(',')',',',';'];
@@ -253,6 +284,13 @@ def getNGramCount(cardName, cardPrice, originalText, setName):
 			word="";
 		else:
 			word+=originalText[i];
+	#deal with case where no dot at the end
+	if(word not in wordSeperators and word != ""):
+		sentence.append(word);
+		#print(sentence);
+		sentences.append(sentence);
+		sentence = [];
+	word="";
 
 	for i in range(0,len(sentences)): #for each sentence
 		upToNGram(sentences[i]);
@@ -278,6 +316,12 @@ def getRarity(rarityVal):
 	else:
 		return "Nothing";
 	#print("rarity "+str(dictRarity[cardName.encode('utf-8')]));
+
+def getPt(val):
+	if "*" in val:
+		return 1;
+	else:
+		return float(val);
 
 if __name__ == "__main__":
 	main();
