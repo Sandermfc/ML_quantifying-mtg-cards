@@ -11,6 +11,7 @@ def clean_desc(description, keywords):
 	para1 = remove_parentheses(para1)
 	para1 = remove_brackets(para1)
 	para1 = remove_char(para1)
+	para1 = remove_commas(para1)
 	para1 = para1.replace('and/or', '')
 	para1 = cDiv(para1)
 	para1 = clean_array(para1, keywords)
@@ -22,6 +23,7 @@ def clean_desc(description, keywords):
 		para2 = remove_parentheses(para2)
 		para2 = remove_brackets(para2)
 		para2 = remove_char(para2)
+		para2 = remove_commas(para2)
 		para2 = para2.replace('and/or', '')
 		para2 = cDiv(para2)
 		para2 = clean_array(para2, keywords)
@@ -34,6 +36,7 @@ def clean_desc(description, keywords):
 		para3 = remove_parentheses(para3)
 		para3 = remove_brackets(para3)
 		para3 = remove_char(para3)
+		para3 = remove_commas(para3)
 		para3 = para3.replace('and/or', '')
 		para3 = cDiv(para3)
 		para3 = clean_array(para3, keywords)
@@ -87,6 +90,6 @@ def remove_commas(s):
 
 def remove_char(s):
 	for i in range(0, len(s)):
-		if not s[i].isalpha():
+		if not s[i].isalpha() and not '.':
 			s = s.replace(s[i], ' ')
 	return s
