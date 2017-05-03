@@ -10,7 +10,7 @@ def main():
 	with open("AllSets-x.json") as file2:
 		data = json.load(file2)
 	OTD = get_data(data, keywords)
-	with open("Set-Card-AbilitiesV2.json", 'w') as file4:
+	with open("Set-Card-Abilities.json", 'w') as file4:
 		json.dump(OTD, file4)
 
 def get_data(data, keywords):
