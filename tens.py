@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 
 settings = tf.app.flags
 SETTINGS = settings.FLAGS
-settings.DEFINE_float('alpha', 0.1, 'Initial learning rate.')
-settings.DEFINE_integer('max_steps', 100000, 'Number of steps to run trainer.')
-settings.DEFINE_integer('display_step', 1000, 'Display logs per step.')
+settings.DEFINE_float('alpha', 3, 'Initial learning rate.')
+settings.DEFINE_integer('max_steps', 10000, 'Number of steps to run trainer.')
+settings.DEFINE_integer('display_step', 100, 'Display logs per step.')
 
 ngramin = {}
 
@@ -95,7 +95,7 @@ def getNGramCount():
 
 		temp = "";
 		numWords = numGram;
-		temp1=0.0
+		temp1 = 0.0
 		for x in range(0, len(sent)):
 			temp+=sent[x]+" ";
 			if( temp.strip().encode("utf-8") in ngramin):
@@ -138,6 +138,11 @@ def getNGramCount():
 							word="";
 						else:
 							word+=row[1][i];
+					if(word not in wordSeperators and word != ""):
+						sentence.append(word);
+						#print(sentence);
+						sentences.append(sentence);
+						sentence = [];
 					ngramcount = 0.0
 					for i in range(0,len(sentences)): #for each sentence
 						temp1 = upToNGram(sentences[i]);
@@ -177,9 +182,23 @@ def rarityChange():
 				writer.writerow(row)
 			
 
-def run_training(train_X, train_Y):
-	X = tf.placeholder(tf.float32, [m, n])
-	Y = tf.placeholder(tf.float32, [m, 1])
+def polyn(X):
+	for i in range(len(X)):
+		X[i][0] = 0.03566*pow(X[i][0],2) - 0.07401*X[i][0] - 0.03566
+		X[i][1] = 0.0000972*pow(X[i][1], 5) - 0.004812*pow(X[i][1], 4) + 0.07381*pow(X[i][1],3) - 0.3591*pow(X[i][1],2) + 0.5503*X[i][1] + 0.01723
+		X[i][2] = -0.01296*X[i][2]
+		X[i][3] = 0.00003123*pow(X[i][3],5) - 0.001432*pow(X[i][3],4) + 0.02162*pow(X[i][3],3) - 0.1175*pow(X[i][3],2) + 0.1829*X[i][3] + 0.05195
+		X[i][4] = 0.01329*pow(X[i][4],2) - 0.05062*X[i][4] - 0.01329
+		X[i][5] = 0.004992*pow(X[i][5],2) + 0.05619*X[i][5] - 0.004992
+		X[i][6] = -0.00003626*pow(X[i][6],7) + 0.0008285*pow(X[i][6],6) - 0.007141*pow(X[i][6],5) + 0.02922*pow(X[i][6],4) - 0.05931*pow(X[i][6],3) + 0.05915*pow(X[i][6],2) - 0.02199*X[i][6] - 0.04356
+		X[i][7] = 0.2261*pow(X[i][7],6) - 0.007512*pow(X[i][7],5) - 0.7398*pow(X[i][7],4) + 0.07484*pow(X[i][7],3) + 0.5864*pow(X[i][7],2) - 0.06682*X[i][7] - 0.107
+
+def run_training(train_X, train_Y, test_X, test_Y):
+	#X = tf.placeholder(tf.float32, [m, n])
+	#Y = tf.placeholder(tf.float32, [m, 1])
+
+	X = tf.placeholder(tf.float32)
+	Y = tf.placeholder(tf.float32)
 
 	# weights
 	W = tf.Variable(tf.zeros([n, 1], dtype=np.float32), name="weight")
@@ -205,6 +224,10 @@ def run_training(train_X, train_Y):
 		training_cost = sess.run(cost, feed_dict={X: np.asarray(train_X), Y: np.asarray(train_Y)})
 		print "Training Cost=", training_cost, "W=", sess.run(W), "b=", sess.run(b), '\n'
 
+		testing_cost = sess.run(tf.reduce_mean(tf.square(activation - Y)) / (2*k),feed_dict={X: test_X, Y: test_Y})
+		print("Testing cost=", testing_cost)
+		print("Absolute mean square loss difference:", abs(training_cost - testing_cost))
+
 		#test_X = read_dataTest("splitData/testData.csv")
 		#test_X = normalize(test_X)
 
@@ -220,7 +243,7 @@ def run_training(train_X, train_Y):
 		predict_X = np.array([8, originalText,1,2,7,3,6,729451], dtype=np.float32).reshape((1, 8))
 		# Do not forget to normalize your features when you make this prediction
 		predict_X = (predict_X - mean) / std
-
+		polyn(predict_X)
 		predict_Y = tf.add(tf.matmul(predict_X, W),b)
 		print "card price =", sess.run(predict_Y)
 
@@ -229,6 +252,7 @@ def run_training(train_X, train_Y):
 		originalText = getNGramNum(temp)
 		predict_X = np.array([3,originalText,1,5,4,3,4,729451], dtype=np.float32).reshape((1, 8))
 		predict_X = (predict_X - mean) / std
+		polyn(predict_X)
 		predict_Y = tf.add(tf.matmul(predict_X, W),b)
 		print "card price =", sess.run(predict_Y)
 
@@ -237,6 +261,7 @@ def run_training(train_X, train_Y):
 		originalText = getNGramNum(temp)
 		predict_X = np.array([2,originalText,1,7,0,3,0,727690], dtype=np.float32).reshape((1, 8))
 		predict_X = (predict_X - mean) / std
+		polyn(predict_X)
 		predict_Y = tf.add(tf.matmul(predict_X, W),b)
 		print "card price =", sess.run(predict_Y)
 
@@ -245,6 +270,7 @@ def run_training(train_X, train_Y):
 		originalText = getNGramNum(temp)
 		predict_X = np.array([2,originalText,1,2,1,1,1,732253], dtype=np.float32).reshape((1, 8))
 		predict_X = (predict_X - mean) / std
+		polyn(predict_X)
 		predict_Y = tf.add(tf.matmul(predict_X, W),b)
 		print "card price =", sess.run(predict_Y)
 
@@ -253,6 +279,7 @@ def run_training(train_X, train_Y):
 		originalText = getNGramNum(temp)
 		predict_X = np.array([4,originalText,1,4,4,3,4,728999], dtype=np.float32).reshape((1, 8))
 		predict_X = (predict_X - mean) / std
+		polyn(predict_X)
 		predict_Y = tf.add(tf.matmul(predict_X, W),b)
 		print "card price =", sess.run(predict_Y)
 
@@ -261,6 +288,7 @@ def run_training(train_X, train_Y):
 		originalText = getNGramNum(temp)
 		predict_X = np.array([3,originalText,1,7,2,3,2,730302], dtype=np.float32).reshape((1, 8))
 		predict_X = (predict_X - mean) / std
+		polyn(predict_X)
 		predict_Y = tf.add(tf.matmul(predict_X, W),b)
 		print "card price =", sess.run(predict_Y)
 
@@ -269,6 +297,7 @@ def run_training(train_X, train_Y):
 		originalText = getNGramNum(temp)
 		predict_X = np.array([5,originalText,1,2,0,3,0,730302], dtype=np.float32).reshape((1, 8))
 		predict_X = (predict_X - mean) / std
+		polyn(predict_X)
 		predict_Y = tf.add(tf.matmul(predict_X, W),b)
 		print "card price =", sess.run(predict_Y)
 
@@ -277,6 +306,7 @@ def run_training(train_X, train_Y):
 		originalText = getNGramNum(temp)
 		predict_X = np.array([9,originalText,1,6,4,3,6,730302], dtype=np.float32).reshape((1, 8))
 		predict_X = (predict_X - mean) / std
+		polyn(predict_X)
 		predict_Y = tf.add(tf.matmul(predict_X, W),b)
 		print "card price =", sess.run(predict_Y)
 
@@ -285,6 +315,7 @@ def run_training(train_X, train_Y):
 		originalText = getNGramNum(temp)
 		predict_X = np.array([6,originalText,1,6,6,4,6,734230], dtype=np.float32).reshape((1, 8))
 		predict_X = (predict_X - mean) / std
+		polyn(predict_X)
 		predict_Y = tf.add(tf.matmul(predict_X, W),b)
 		print "card price =", sess.run(predict_Y)
 
@@ -295,42 +326,47 @@ def run_training(train_X, train_Y):
 
 
 def read_data(filename, read_from_file = True):
-    global m, n
+	global m, n
 
-    if read_from_file:
-        with open(filename) as fd:
-            data_list = fd.read().splitlines()
+	if read_from_file:
+		with open(filename) as fd:
+			data_list = fd.read().splitlines()
 
-            m = len(data_list) # number of examples
-            n = 8 # number of features
+			m = len(data_list) # number of examples
+			n = 8 # number of features
 
-            train_X = np.zeros([m, n], dtype=np.float32)
-            train_Y = np.zeros([m, 1], dtype=np.float32)
+			train_X = np.zeros([m, n], dtype=np.float32)
+			train_Y = np.zeros([m, 1], dtype=np.float32)
 
-            for i in range(m):
-                datas = data_list[i].split(',')
-                for j in range(n):
-                    train_X[i][j] = float(datas[j][1:len(datas[j])-1]);
-                train_Y[i][0] = float(datas[-1][1:len(datas[j])-3])
+			for i in range(m):
+				datas = data_list[i].split(',')
+				for j in range(n):
+					train_X[i][j] = float(datas[j][1:len(datas[j])-1]);
+				train_Y[i][0] = float(datas[-1][1:len(datas[j])-3])
 
-    return train_X, train_Y
+	return train_X, train_Y
 
 def read_dataTest(filename, read_from_file = True):
-    if read_from_file:
-        with open(filename) as fd:
-            data_list = fd.read().splitlines()
+	global k
 
-            m = len(data_list) # number of examples
-            n = 8 # number of features
+	if read_from_file:
+		with open(filename) as fd:
+			data_list = fd.read().splitlines()
 
-            test_X = np.zeros([m, n], dtype=np.float32)
+			k = len(data_list) # number of examples
+			l = 8 # number of features
 
-            for i in range(m):
-                datas = data_list[i].split(',')
-                for j in range(n):
-                    test_X[i][j] = float(datas[j][1:len(datas[j])-1]);
+			test_X = np.zeros([k, l], dtype=np.float32)
+			test_Y = np.zeros([k, 1], dtype=np.float32)
 
-    return test_X
+			for i in range(k):
+				datas = data_list[i].split(',')
+				for j in range(n):
+					test_X[i][j] = float(datas[j][1:len(datas[j])-1]);
+				test_Y[i][0] = float(datas[-1][1:len(datas[j])-3])
+
+
+	return test_X, test_Y
 
 
 def normalize(train_X):
@@ -344,12 +380,16 @@ def normalize(train_X):
 import sys
 
 def main():
-	rarityChange()
-	getNGramCount()
-	separateInputs()
+	#rarityChange()
+	#getNGramCount()
+	#separateInputs()
 	[X, Y] = read_data("splitData/learningData.csv")
+	[test_X, test_Y] = read_dataTest("splitData/testData.csv")
 	X = normalize(X)
-	run_training(X, Y)
+	polyn(X)
+	#X = normalize(X)
+	print X
+	run_training(X, Y, test_X, test_Y)
 
 	print("main")
 

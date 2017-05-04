@@ -50,42 +50,72 @@ def main():
 	x_releaseDate = normalize(x_releaseDate)
 	y_price = normalize(y_price)
 
-	listc = zip(x_description, y_price)
-	listc = sorted(listc)
-	[x_description, y_price] = zip(*listc)
-
-	plt.plot(x_description, y_price, 'ro', label='Original data')
-	p = np.polyfit(x_description, y_price, 6)
-	f = np.poly1d(p)
-	print f
-
-	x_new = np.linspace(x_description[0], x_description[-1], 100)
-	y_new = f(x_new)
-
-	plt.plot(x_description,y_price,'ro')
-	plt.plot(x_new, y_new, '-')
 #-----------------------------------------------------------------
+
+	#listc = zip(x_cmc, y_price)
+	#listc = sorted(listc)
+	#[x_cmc, y_price] = zip(*listc)
+
 	#plt.plot(x_cmc, y_price, 'ro', label='Original data')
+	#p = np.polyfit(x_cmc, y_price, 2)
+	#f = np.poly1d(p)
+	#print f
+
+	#x_new = np.linspace(x_cmc[0], x_cmc[-1], 100)
+	#y_new = f(x_new)
+
+	#plt.plot(x_cmc,y_price,'ro')
+	#plt.plot(x_new, y_new, '-')
+	#         2
+	#0.03566 x - 0.07401 x - 0.03566
+
+#-----------------------------------------------------------------
+
+	#listc = zip(x_description, y_price)
+	#listc = sorted(listc)
+	#[x_description, y_price] = zip(*listc)
+
+	#plt.plot(x_description, y_price, 'ro', label='Original data')
+	#p = np.polyfit(x_description, y_price, 5)
+	#f = np.poly1d(p)
+	#print f
+
+	#x_new = np.linspace(x_description[0], x_description[-1], 100)
+	#y_new = f(x_new)
+
+	#plt.plot(x_description,y_price,'ro')
+	#plt.plot(x_new, y_new, '-')
+
+	#          5            4           3          2
+	#9.72e-05 x - 0.004812 x + 0.07381 x - 0.3591 x + 0.5503 x + 0.01723
+
 #------------------------------------------------------------------
+
+	#listc = zip(x_numOfColors, y_price)
+	#listc = sorted(listc)
+	#[x_numOfColors, y_price] = zip(*listc)
+
 	#plt.plot(x_numOfColors, y_price, 'ro', label='Original data')
 	#p = np.polyfit(x_numOfColors, y_price, 1)
 	#f = np.poly1d(p)
 	#print f
 
-	#x_new = np.linspace(x_numOfColors[0], 5, 100)
+	#x_new = np.linspace(x_numOfColors[0], x_numOfColors[-1], 100)
 	#y_new = f(x_new)
 
 	#plt.plot(x_numOfColors,y_price,'ro')
 	#plt.plot(x_new, y_new, '-')
+
+	#-0.01296 x + 6.301e-17
+
 #------------------------------------------------------------------
+
 	#listc = zip(x_numOfReprints, y_price)
 	#listc = sorted(listc)
 	#[x_numOfReprints, y_price] = zip(*listc)
-	#print x_numOfReprints
-	#print y_price
 
 	#plt.plot(x_numOfReprints, y_price, 'ro', label='Original data')
-	#p = np.polyfit(x_numOfReprints, y_price, 2)
+	#p = np.polyfit(x_numOfReprints, y_price, 5)
 	#f = np.poly1d(p)
 	#print f
 
@@ -94,13 +124,18 @@ def main():
 
 	#plt.plot(x_numOfReprints,y_price,'ro')
 	#plt.plot(x_new, y_new, '-')
+
+    #	        5            4           3          2
+	#3.123e-05 x - 0.001432 x + 0.02162 x - 0.1175 x + 0.1829 x + 0.05195
+
 #------------------------------------------------------------------
+	
 	#listc = zip(x_power, y_price)
 	#listc = sorted(listc)
 	#[x_power, y_price] = zip(*listc)
 
 	#plt.plot(x_power, y_price, 'ro', label='Original data')
-	#p = np.polyfit(x_power, y_price, 3)
+	#p = np.polyfit(x_power, y_price, 2)
 	#f = np.poly1d(p)
 	#print f
 
@@ -110,13 +145,17 @@ def main():
 	#plt.plot(x_power,y_price,'ro')
 	#plt.plot(x_new, y_new, '-')
 
+	#         2
+	#0.01329 x - 0.05062 x - 0.01329
+
 #-------------------------------------------------------------------
+
 	#listc = zip(x_rarity, y_price)
 	#listc = sorted(listc)
 	#[x_rarity, y_price] = zip(*listc)
 
 	#plt.plot(x_rarity, y_price, 'ro', label='Original data')
-	#p = np.polyfit(x_rarity, y_price, 3)
+	#p = np.polyfit(x_rarity, y_price, 2)
 	#f = np.poly1d(p)
 	#print f
 
@@ -126,9 +165,11 @@ def main():
 	#plt.plot(x_rarity,y_price,'ro')
 	#plt.plot(x_new, y_new, '-')
 
-	#plt.legend()
-	#plt.show()
+    #  	       2
+	#0.004992 x + 0.05619 x - 0.004992
+
 #--------------------------------------------------------------------
+
 	#listc = zip(x_toughness, y_price)
 	#listc = sorted(listc)
 	#[x_toughness, y_price] = zip(*listc)
@@ -143,21 +184,29 @@ def main():
 
 	#plt.plot(x_toughness,y_price,'ro')
 	#plt.plot(x_new, y_new, '-')
+
+	#            7             6            5           4           3			2
+	#-3.626e-05 x + 0.0008285 x - 0.007141 x + 0.02922 x - 0.05931 x + 0.05915 x - 0.02199 x - 0.04356
+
 #-------------------------------------------------------------------
-	#listc = zip(x_releaseDate, y_price)
-	#listc = sorted(listc)
-	#[x_releaseDate, y_price] = zip(*listc)
+	listc = zip(x_releaseDate, y_price)
+	listc = sorted(listc)
+	[x_releaseDate, y_price] = zip(*listc)
 
-	#plt.plot(x_releaseDate, y_price, 'ro', label='Original data')
-	#p = np.polyfit(x_releaseDate, y_price, 6)
-	#f = np.poly1d(p)
-	#print f
+	plt.plot(x_releaseDate, y_price, 'ro', label='Original data')
+	p = np.polyfit(x_releaseDate, y_price, 6)
+	f = np.poly1d(p)
+	print f
 
-	#x_new = np.linspace(x_releaseDate[0], x_releaseDate[-1], 100)
-	#y_new = f(x_new)
+	x_new = np.linspace(x_releaseDate[0], x_releaseDate[-1], 100)
+	y_new = f(x_new)
 
-	#plt.plot(x_releaseDate,y_price,'ro')
-	#plt.plot(x_new, y_new, '-')
+	plt.plot(x_releaseDate,y_price,'ro')
+	plt.plot(x_new, y_new, '-')
+
+	#        6            5          4           3          2
+	#0.2261 x - 0.007512 x - 0.7398 x + 0.07484 x + 0.5864 x - 0.06682 x - 0.107
+
 
 	plt.legend()
 	plt.show()
