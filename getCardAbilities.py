@@ -10,7 +10,7 @@ def main():
 	with open("AllSets-x.json") as file2:
 		data = json.load(file2)
 	OTD = get_data(data, keywords)
-	with open("Set-Card-AbilitiesAll.json", 'w') as file4:
+	with open("Set-Card-AbilitiesV2.json", 'w') as file4:
 		json.dump(OTD, file4)
 
 def get_data(data, keywords):
@@ -30,8 +30,6 @@ def get_data(data, keywords):
 					cleaned = splitd.clean_desc(card["originalText"].encode('utf-8'), keywords)[0]
 					if len(cleaned) > 0:
 						OT[card["name"].encode('utf-8')] = cleaned
-					else:
-						OT[card["name"].encode('utf-8')] = []
 			if len(OT) > 0:
 				OTD[key] = OT
 		else:
