@@ -3,6 +3,7 @@ import json
 import re
 import operator
 
+
 def clean_desc(description, keywords):
 	#Get 3 first paragraphes
 	para1 = description.splitlines()[0]
@@ -13,7 +14,7 @@ def clean_desc(description, keywords):
 	para1 = remove_char(para1)
 	para1 = remove_commas(para1)
 	para1 = para1.replace('and/or', '')
-	para1 = cDiv(para1)
+	para1 = cDiv(para1.title())
 	para1 = clean_array(para1, keywords)
 	kw = list(para1[0])
 	if len(para1[1]) > 0:
@@ -62,7 +63,11 @@ def clean_array(arr, keywords):
 		else:
 			description = ' '.join([arr[k] for k in range(i, len(arr))])
 			break
-	return [cleaned, description]
+	for word in keywords:
+		if description.find(word) != -1 or description.find(word.lower()) != -1:
+			cleaned.append(keywords[word.title()])
+			description = description.replace(word, '')
+	return [cleaned, description.lower()]
 
 #Devides a string at every capital letter.
 def cDiv(s):
@@ -90,6 +95,6 @@ def remove_commas(s):
 
 def remove_char(s):
 	for i in range(0, len(s)):
-		if not s[i].isalpha() and not '.':
+		if not str(s[i]).isalpha() and not '.':
 			s = s.replace(s[i], ' ')
 	return s
