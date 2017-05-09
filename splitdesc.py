@@ -2,7 +2,9 @@ import os
 import json
 import re
 import operator
-
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 def clean_desc(description, keywords):
 	#Get 3 first paragraphes
@@ -63,11 +65,13 @@ def clean_array(arr, keywords):
 		else:
 			description = ' '.join([arr[k] for k in range(i, len(arr))])
 			break
-	for word in keywords:
-		if description.find(word) != -1 or description.find(word.lower()) != -1:
-			cleaned.append(keywords[word.title()])
-			description = description.replace(word, '')
-	return [cleaned, description.lower()]
+	if description != []:
+		for word in keywords:
+			if (description.find(keywords[word.title()]) != -1 or description.find(keywords[word.title()].lower()) != -1) and (word != "Battle"):
+				cleaned.append(keywords[word.title()])
+				description = description.replace(word, '')
+		description = description.lower()
+	return [cleaned, description]
 
 #Devides a string at every capital letter.
 def cDiv(s):
