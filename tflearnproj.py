@@ -194,22 +194,36 @@ def polyn(X):
 
 def learn(train_X, train_Y, test_X, test_Y):
 
-	print(train_X.shape)
-	print(train_Y.shape)
+	print(train_X)
+	print(train_Y)
 	# Linear Regression graph
 	input_ = tflearn.input_data(shape=[None,8])
-	linear = tflearn.input_data(shape=[None,1])
+	linear = tflearn.fully_connected(input_, 1)
 	regression = tflearn.regression(linear, optimizer='sgd', loss='mean_square', metric='R2', learning_rate=0.01)
 	m = tflearn.DNN(regression)
-	m.fit(train_X, train_Y, n_epoch=1000, show_metric=True, snapshot_epoch=False)
+	m.fit(train_X, train_Y, n_epoch=100, show_metric=True, snapshot_epoch=False)
 
 	print("\nRegression result:")
 	print("Y = " + str(m.get_weights(linear.W)) +
 	    "*X + " + str(m.get_weights(linear.b)))
 
-
-	print(m.predict(test_X))
-	
+	difference = 0
+	diffmoyen  = 0
+	moyTest = 0
+	moyPredict = 0
+	pricePredict = m.predict(test_X)
+	for i in range(len(test_Y)):
+		difference = pricePredict[i] - test_Y[i]
+		diffmoyen += difference
+		moyTest = test_Y[i]
+		moyPredict = pricePredict[i]
+	diffmoyen = diffmoyen / len(test_Y)
+	moyPredict = moyPredict[0]
+	moyPredict = moyPredict / len(test_Y)
+	moyTest = moyTest / len(test_Y)
+	print("diffmoyen" + str(diffmoyen))
+	print("test moy" + str(moyTest))
+	print("test predict" + str(moyPredict))
 
 def read_data(filename, read_from_file = True):
 	global m, n
@@ -273,7 +287,9 @@ def main():
 	[test_X, test_Y] = read_dataTest("splitData/testData.csv")
 	X = normalize(X)
 	polyn(X)
-	#X = normalize(X)
+	test_X = normalize(test_X)
+	polyn(test_X)
+	test_X = normalize(test_X)
 	#print X
 	learn(X, Y, test_X, test_Y)
 
