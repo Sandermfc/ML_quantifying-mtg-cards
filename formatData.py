@@ -2,6 +2,7 @@ import os
 import json
 import re #regular expressions
 import datetime
+import splitdesc as splitdesc
 
 nGramDict = {};
 nGramVal = {};
@@ -212,11 +213,12 @@ def getCardPrice(cardName, cardPrices):
 		return -1;
 
 def getDescription(cardName, cardPrice, originalText, setName):
-	originalText = originalText.replace(cardName, "this");
-	#originalText = jeansFunction();
-	originalText = originalText.lower();
-	getNGramCount(cardName,cardPrice,originalText, setName);
-	return originalText;
+	originalText = originalText.replace(cardName, "this")
+	with open("Keywords-Dict.json") as dic:
+		[dummy, originalText] = splitdesc.clean_desc(originalText, dic)
+	originalText = originalText.lower()
+	getNGramCount(cardName,cardPrice,originalText, setName)
+	return originalText
 
 def getNGramCount(cardName, cardPrice, originalText, setName):
 	#subfunction
