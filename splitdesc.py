@@ -16,7 +16,7 @@ def clean_desc(description, keywords):
 	para1 = remove_char(para1)
 	para1 = remove_commas(para1)
 	para1 = para1.replace('and/or', '')
-	para1 = cDiv(para1.title())
+	para1 = cDiv(para1)
 	para1 = clean_array(para1, keywords)
 	kw = list(para1[0])
 	if len(para1[1]) > 0:
@@ -50,11 +50,11 @@ def clean_desc(description, keywords):
 
 	return [kw, newDesc]
 
-#This function will return an array containing only keyword abilities. TO DO: add something that accepts Flying and flying.
-#Also add a way to make multiple word abilities just one element in the array.
+#This function will return an array containing only keyword abilities.
 def clean_array(arr, keywords):
 	cleaned = []
 	description = []
+	print(arr)
 	for i in range(0, len(arr)):
 		if i+1 > len(arr):
 			break
