@@ -6,6 +6,7 @@ import io
 def main():
 	with open("splitData/input.csv", "w") as myfile:
 		writer = csv.writer(myfile, quotechar = '"', quoting=csv.QUOTE_ALL)
+		writer.writerow(["cmc","description","numOfColors","numOfReprints","power","rarity","toughness","keywords","releaseDate","price"])
 		with open('parsedData/cmc.json', 'r') as file1:
 			cmc = json.load(file1)
 		with open('parsedData/descriptions.json', 'r') as file2:
@@ -20,13 +21,12 @@ def main():
 			rarity = json.load(file6)
 		with open('parsedData/toughness.json', 'r') as file7:
 			toughness = json.load(file7)
-		#with open('keywords.json', 'r') as file8:
-		#	keywords = load(file8)
+		with open('parsedData/keywords.json', 'r') as file8:
+			keywords = json.load(file8)
 		with open('parsedData/releaseDate.json', 'r') as file9:
 			releaseDate = json.load(file9)
 		with open('parsedData/price.json', 'r') as file10:
 			price = json.load(file10)
-			
 		for sets in cmc:
 			for card in cmc[sets]:
 				value1 = cmc[sets][card]
@@ -36,11 +36,10 @@ def main():
 				value5 = power[sets][card]
 				value6 = rarity[sets][card]
 				value7 = toughness[sets][card]
-				#value8 = keywords[sets][card]
+				value8 = keywords[sets][card]
 				value9 = releaseDate[sets][card]
 				value10 = price[sets][card]
 				value2 = value2.replace('\n', '')
-				writer.writerow([value1,value2,value3,value4,value5,value6,value7,value9,value10])
-				
+				writer.writerow([value1,value2,value3,value4,value5,value6,value7,value8,value9,value10])
 if __name__ == "__main__":
 	main();
