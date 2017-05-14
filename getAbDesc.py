@@ -5,15 +5,19 @@ import operator
 import splitdesc as splitd
 
 def main():
-	with open("Keywords-Dict.json") as file1:
-		keywords = json.load(file1)
+	keywords = {}
+	with open('keywords2.txt', 'r') as file2:
+		for line in file2:
+			keywords[line.strip('\n').split(' ')[0]] = line.strip('\n');
 	with open("AllSets-x.json") as file2:
 		data = json.load(file2)
+
 	[OTD, OTD2] = get_data(data, keywords)
+
+	#Put keywords in a json file.
 	with open("keywords.json", 'w') as file4:
 		json.dump(OTD, file4)
-
-
+	#Put descriptions in a json file.
 	with open("descriptions.json", 'w') as descfile:
 		json.dump(OTD2, descfile)
 
