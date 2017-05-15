@@ -27,11 +27,11 @@ def separateInputs():
 					data = list(reader)
 					for row in data:
 						a = random.randint(0,9)
-						if(a < 7):
+						if(a < 8):
 							writerl.writerow(row)
 						#elif(a > 5 and a < 8):
 							writerv.writerow(row)
-						elif(a > 6 and a < 10):
+						elif(a > 7 and a < 10):
 							writert.writerow(row)
 
 def getNGramNum(originalText):
@@ -105,12 +105,13 @@ def getNGramCount():
 				break;
 		return temp1
 	with open("splitData/input2.csv", 'r') as inputfile:
+		next(inputfile)
 		with open("parsedData/ngramVal.json", "r") as file1:
 			with open("splitData/input3.csv", "w") as outputfile:
 				ngramin = json.load(file1)
-
 				reader = csv.reader(inputfile,delimiter = ",")
 				writer = csv.writer(outputfile, quotechar = '"', quoting=csv.QUOTE_ALL)
+				writer.writerow(["cmc","description","numOfColors","numOfReprints","power","rarity","toughness","keywords","releaseDate","price"])
 				#Example for numGram = 3
 				#for each SENTENCE in the description, do 1 gram;2 gram;3gram on the first 1,2 and 3 words
 				#then do 3 gram for the rest of the sentence (do not do 2gram and 1 gram on the last 2 and 1 words)
@@ -235,6 +236,7 @@ def run_training(train_X, train_Y, test_X, test_Y):
 		        					#cmc,desc,numcol,numreprint,power,rarity,tough,release
 		#temp = "When Protean Hulk is put into a graveyard from play, search your library for any number of creatures cards with total converted mana cost 6 or less and put them into play. Then shuffle your library."
 		#temp = ""
+		"""
 		temp = "if this attacks and is blocked, you may choose to have it deal its damage to the defending player instead of to the creatures blocking it."
 		originalText = getNGramNum(temp)
 
@@ -318,7 +320,7 @@ def run_training(train_X, train_Y, test_X, test_Y):
 		polyn(predict_X)
 		predict_Y = tf.add(tf.matmul(predict_X, W),b)
 		print "card price =", sess.run(predict_Y)
-
+		"""
 		#plt.plot(train_X, train_Y, 'ro', label='Original data')
 		#plt.plot(train_X, sess.run(W) * train_X + sess.run(b), label='Fitted line')
 		#plt.legend()
@@ -330,10 +332,11 @@ def read_data(filename, read_from_file = True):
 
 	if read_from_file:
 		with open(filename) as fd:
+			fd.readline()
 			data_list = fd.read().splitlines()
 
 			m = len(data_list) # number of examples
-			n = 8 # number of features
+			n = 9 # number of features
 
 			train_X = np.zeros([m, n], dtype=np.float32)
 			train_Y = np.zeros([m, 1], dtype=np.float32)
@@ -341,7 +344,7 @@ def read_data(filename, read_from_file = True):
 			for i in range(m):
 				datas = data_list[i].split(',')
 				for j in range(n):
-					train_X[i][j] = float(datas[j][1:len(datas[j])-1]);
+					train_X[i][j] = float(datas[j][1:len(datas[j])-1])
 				train_Y[i][0] = float(datas[-1][1:len(datas[j])-3])
 
 	return train_X, train_Y
@@ -351,17 +354,19 @@ def read_dataTest(filename, read_from_file = True):
 
 	if read_from_file:
 		with open(filename) as fd:
+			fd.readline()
 			data_list = fd.read().splitlines()
 
 			k = len(data_list) # number of examples
-			l = 8 # number of features
+			l = 9 # number of features
 
 			test_X = np.zeros([k, l], dtype=np.float32)
 			test_Y = np.zeros([k, 1], dtype=np.float32)
 
 			for i in range(k):
 				datas = data_list[i].split(',')
-				for j in range(n):
+				for j in range(l):
+					print 1
 					test_X[i][j] = float(datas[j][1:len(datas[j])-1]);
 				test_Y[i][0] = float(datas[-1][1:len(datas[j])-3])
 
@@ -385,10 +390,10 @@ def main():
 	#separateInputs()
 	[X, Y] = read_data("splitData/learningData.csv")
 	[test_X, test_Y] = read_dataTest("splitData/testData.csv")
-	X = normalize(X)
-	polyn(X)
 	#X = normalize(X)
-	print X
+	#polyn(X)
+	#X = normalize(X)
+	#print X
 	run_training(X, Y, test_X, test_Y)
 
 	print("main")
