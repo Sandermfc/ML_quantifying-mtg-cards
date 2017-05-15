@@ -48,13 +48,12 @@ def clean_desc(description, keywords):
 			newDesc = newDesc + " " + para3[1]
 
 
-	return [kw, newDesc]
+	return [list(set(kw)), newDesc]
 
 #This function will return an array containing only keyword abilities.
 def clean_array(arr, keywords):
 	cleaned = []
 	description = []
-	print(arr)
 	for i in range(0, len(arr)):
 		if i+1 > len(arr):
 			break
