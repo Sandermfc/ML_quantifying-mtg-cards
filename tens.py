@@ -54,7 +54,7 @@ def getNGramNum(originalText):
 		numGram = 3;
 
 		#seperate into sentences and words
-		wordSeperators = [' ', '\n'];	
+		wordSeperators = [' ', '\n'];
 		sentenceSeperators = ['.','(',')',','];
 		removeTheseFromFront = [' ','\n','\t'];
 
@@ -118,7 +118,7 @@ def getNGramCount():
 				numGram = 3;
 
 				#seperate into sentences and words
-				wordSeperators = [' ', '\n'];	
+				wordSeperators = [' ', '\n'];
 				sentenceSeperators = ['.','(',')',','];
 				removeTheseFromFront = [' ','\n','\t'];
 				data = list(reader)
@@ -181,7 +181,7 @@ def rarityChange():
 				if(row[5] == "Nothing"):
 					row[5] = 2.5
 				writer.writerow(row)
-			
+
 
 def polyn(X):
 	for i in range(len(X)):
@@ -373,6 +373,27 @@ def read_dataTest(filename, read_from_file = True):
 
 	return test_X, test_Y
 
+def keywordsCount():
+	with open("kvals.json") as p:
+		prices = json.load(p)
+
+	r = csv.reader(open("splitData/input3.csv"))
+	input3 = [l for l in r]
+
+	for k in range(0, len(input3)):
+		if input3[k][7] != "[]":
+			input3[k][7] = input3[k][7].translate(None, " []'")
+			temp = input3[k][7].split(",")
+			som = 0
+			for t in range(0, len(temp)):
+				if temp[t][1:] in prices:
+					som += prices[temp[t][1:]]
+			input3[k][7] = som
+		else:
+			input3[k][7] = 0
+	writer = csv.writer(open('splitData/output3.csv', 'wb'))
+	writer.writerows(input3)
+	return None
 
 def normalize(train_X):
 
