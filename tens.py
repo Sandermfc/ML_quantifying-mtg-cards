@@ -380,7 +380,7 @@ def keywordsCount():
 	r = csv.reader(open("splitData/input3.csv"))
 	input3 = [l for l in r]
 
-	for k in range(0, len(input3)):
+	for k in range(1, len(input3)):
 		if input3[k][7] != "[]":
 			input3[k][7] = input3[k][7].translate(None, " []'")
 			temp = input3[k][7].split(",")
@@ -391,7 +391,7 @@ def keywordsCount():
 			input3[k][7] = som
 		else:
 			input3[k][7] = 0
-	writer = csv.writer(open('splitData/output3.csv', 'wb'))
+	writer = csv.writer(open('splitData/input4.csv', 'wb'))
 	writer.writerows(input3)
 	return None
 
