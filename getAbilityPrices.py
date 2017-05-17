@@ -10,7 +10,7 @@ def main():
 		data = json.load(file1)
 	keywords = {};
 	#Create a dictionnary containing all the keyword abilities.
-	with open('keywords.json') as file2:
+	with open('parsedData/keywords.json') as file2:
 		cards = json.load(file2)
 
 	cp = {}
@@ -32,7 +32,7 @@ def main():
 		AbilityPrices[word] = somme / len(AbilityPrices[word])
 
 	#Write a json file that contains the prices for each ability.
-	with open("kvals.json", 'w') as file3:
+	with open("parsedData/kvals.json", 'w') as file3:
 		json.dump(AbilityPrices, file3)
 		file3.close()
 

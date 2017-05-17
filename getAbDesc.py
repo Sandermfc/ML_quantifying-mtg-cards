@@ -15,10 +15,10 @@ def main():
 	[OTD, OTD2] = get_data(data, keywords)
 
 	#Put keywords in a json file.
-	with open("keywords.json", 'w') as file4:
+	with open("parsedData/keywords.json", 'w') as file4:
 		json.dump(OTD, file4)
 	#Put descriptions in a json file.
-	with open("descriptions.json", 'w') as descfile:
+	with open("parsedData/descriptions.json", 'w') as descfile:
 		json.dump(OTD2, descfile)
 
 def get_data(data, keywords):
