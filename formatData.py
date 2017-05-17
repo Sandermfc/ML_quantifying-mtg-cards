@@ -214,8 +214,9 @@ def getCardPrice(cardName, cardPrices):
 
 def getDescription(cardName, cardPrice, originalText, setName):
 	originalText = originalText.replace(cardName, "this")
-	with open("Keywords-Dict.json") as dic:
-		[dummy, originalText] = splitdesc.clean_desc(originalText, dic)
+	with open("Keywords-Dict.json") as file1:
+		keywords = json.load(file1)
+	[dummy, originalText] = splitdesc.clean_desc(originalText.encode('utf-8'), keywords)
 	originalText = originalText.lower()
 	getNGramCount(cardName,cardPrice,originalText, setName)
 	return originalText
