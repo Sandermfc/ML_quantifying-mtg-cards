@@ -197,19 +197,17 @@ def polyn(X):
 
 def learn(train_X, train_Y, test_X, test_Y):
 
-	print(train_X)
-	print(train_Y)
 	# Linear Regression graph
 	net = tflearn.input_data(shape=[None,9])
 	#net = tflearn.layers.normalization.batch_normalization (net, beta=0.0, gamma=1.0, epsilon=1e-05, decay=0.9, stddev=0.002, trainable=True, restore=True, reuse=False, scope=None, name='BatchNormalization')
-	net = tflearn.fully_connected(net, 9, activation="relu")
-	net = tflearn.dropout(net, 0.7)
-	net = tflearn.fully_connected(net, 81, activation="relu")
-	net = tflearn.dropout(net, 0.5)
-	net = tflearn.fully_connected(net, 1, activation="softplus")
-	regression = tflearn.regression(net, optimizer='sgd', loss='mean_square', metric='R2', learning_rate=0.1)
-	m = tflearn.DNN(regression)
-	m.fit(train_X, train_Y, validation_set=0.2, n_epoch=100, show_metric=True, snapshot_epoch=False)
+	net = tflearn.fully_connected(net, 9, activation="relu", name="fully_connected_1")
+	net = tflearn.dropout(net, 0.7, name="dropout_1")
+	net = tflearn.fully_connected(net, 81, activation="relu", name="fully_connected_2")
+	net = tflearn.dropout(net, 0.5, name="dropout_2")
+	net = tflearn.fully_connected(net, 1, activation="softplus", name="single_output")
+	regression = tflearn.regression(net, optimizer='sgd', loss='mean_square', metric='R2', learning_rate=0.1, name="regression")
+	m = tflearn.DNN(regression, tensorboard_verbose=3)
+	m.fit(train_X, train_Y, validation_set=0.2, n_epoch=100, show_metric=True, snapshot_epoch=False, run_id="FinalFinal")
 
 	print("\nRegression result:")
 	print("Y = " + str(m.get_weights(net.W)) +
@@ -220,23 +218,30 @@ def learn(train_X, train_Y, test_X, test_Y):
 		print(str(i)+" "+str(j))
 	print("evaluate: " + str(m.evaluate(test_X, test_Y)))
 
-	m.save("dnn_mtg_price_predictor")
+	m.save("dnn_mtg_price_predictor.tfl")
 
-def test(input):
+def test(input_, realValues = None):
+	input_ = normalize(input_)
 	# Linear Regression graph
 	net = tflearn.input_data(shape=[None,9])
 	#net = tflearn.layers.normalization.batch_normalization (net, beta=0.0, gamma=1.0, epsilon=1e-05, decay=0.9, stddev=0.002, trainable=True, restore=True, reuse=False, scope=None, name='BatchNormalization')
-	net = tflearn.fully_connected(net, 9, activation="relu")
-	net = tflearn.dropout(net, 0.5)
-	net = tflearn.fully_connected(net, 81, activation="relu")
-	net = tflearn.dropout(net, 0.5)
-	net = tflearn.fully_connected(net, 1, activation="softplus")
-	regression = tflearn.regression(net, optimizer='sgd', loss='mean_square', metric='R2', learning_rate=0.1)
-	m = tflearn.DNN(regression)
+	net = tflearn.fully_connected(net, 9, activation="relu", name="fully_connected_1")
+	net = tflearn.dropout(net, 0.7, name="dropout_1")
+	net = tflearn.fully_connected(net, 81, activation="relu", name="fully_connected_2")
+	net = tflearn.dropout(net, 0.5, name="dropout_2")
+	net = tflearn.fully_connected(net, 1, activation="softplus", name="single_output")
+	regression = tflearn.regression(net, optimizer='sgd', loss='mean_square', metric='R2', learning_rate=0.1, name="regression")
+	m = tflearn.DNN(regression, tensorboard_verbose=3)
 
-	if(os.path.isfile("dnn_mtg_price_predictor")):
-		m.load("dnn_mtg_price_predictor")
-	print(m.predict(input))
+	m.load("dnn_mtg_price_predictor.tfl")
+	
+	prediction = m.predict(input_)
+	if(not realValues is None):
+		for i,j in zip(prediction, realValues):
+			print(str(i)+" "+str(j))
+	else:
+		print(prediction)
+
 
 def read_data(filename, read_from_file = True):
 	global m, n
@@ -280,7 +285,6 @@ def read_dataTest(filename, read_from_file = True):
 					test_X[i][j] = float(datas[j][1:len(datas[j])-1]);
 				test_Y[i][0] = float(datas[-1][1:len(datas[j])-3])
 
-
 	return test_X, test_Y
 
 
@@ -315,22 +319,25 @@ def keywordsCount():
 	return None
 
 import sys
+import os
 
 def main():
-	rarityChange()
-	getNGramCount()
-	separateInputs()
-	keywordsCount()
-	[X, Y] = read_data("splitData/learningData.csv")
+	
 	[test_X, test_Y] = read_dataTest("splitData/testData.csv")
-	#polyn(X)
-	X = normalize(X)
-	#polyn(test_X)
-	test_X = normalize(test_X)
-	learn(X, Y, test_X, test_Y)
+	if len(sys.argv) > 1 and sys.argv[1] == "test":
+		test(test_X, test_Y)
+	else:
+		rarityChange()
+		getNGramCount()
+		separateInputs()
+		keywordsCount()
 
-	print("main")
+		[X, Y] = read_data("splitData/learningData.csv")
 
+		X = normalize(X)
+		test_X = normalize(test_X)
+
+		learn(X, Y, test_X, test_Y)
 
 if __name__ == "__main__":
 	main();
