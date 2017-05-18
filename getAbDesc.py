@@ -8,7 +8,8 @@ def main():
 	keywords = {}
 	with open('keywords2.txt', 'r') as file2:
 		for line in file2:
-			keywords[line.strip('\n').split(' ')[0]] = line.strip('\n');
+			line = line.strip('\n').strip('\r')
+			keywords[line.split(' ')[0]] = line;
 	with open("AllSets-x.json") as file2:
 		data = json.load(file2)
 
