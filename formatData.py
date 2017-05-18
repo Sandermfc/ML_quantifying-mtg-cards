@@ -165,8 +165,6 @@ def main():
 	print("parsedData/ammount of ngram's = "+str(len(nGramVal)));
 	with open("parsedData/ngramCount"+".json", 'w') as fp:
 		json.dump(nGramDict, fp);
-	with open("parsedData/keywords"+".json", 'w') as fp:
-		json.dump(keyword, fp);
 	with open("parsedData/descriptions"+".json", 'w') as fp:
 		json.dump(description, fp);
 	with open("parsedData/cmc"+".json", 'w') as fp:
