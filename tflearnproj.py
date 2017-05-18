@@ -280,9 +280,9 @@ def normalize(train_X):
 import sys
 
 def main():
-	#rarityChange()
-	#getNGramCount()
-	#separateInputs()
+	rarityChange()
+	getNGramCount()
+	separateInputs()
 	[X, Y] = read_data("splitData/learningData.csv")
 	[test_X, test_Y] = read_dataTest("splitData/testData.csv")
 	X = normalize(X)

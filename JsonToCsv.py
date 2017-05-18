@@ -29,17 +29,21 @@ def main():
 			price = json.load(file10)
 		for sets in cmc:
 			for card in cmc[sets]:
-				value1 = cmc[sets][card]
-				value2 = description[sets][card]
-				value3 = numOfColors[sets][card]
-				value4 = numOfReprints[sets][card]
-				value5 = power[sets][card]
-				value6 = rarity[sets][card]
-				value7 = toughness[sets][card]
-				value8 = keywords[sets][card]
-				value9 = releaseDate[sets][card]
-				value10 = price[sets][card]
-				value2 = value2.replace('\n', '')
+				try:
+					value1 = cmc[sets][card]
+					value2 = description[sets][card]
+					value3 = numOfColors[sets][card]
+					value4 = numOfReprints[sets][card]
+					value5 = power[sets][card]
+					value6 = rarity[sets][card]
+					value7 = toughness[sets][card]
+					value8 = keywords[sets][card]
+					value9 = releaseDate[sets][card]
+					value10 = price[sets][card]
+					value2 = value2.replace('\n', '')
+				except:
+					pass
+					#print("set doesnt exist");
 				writer.writerow([value1,value2,value3,value4,value5,value6,value7,value8,value9,value10])
 if __name__ == "__main__":
 	main();
