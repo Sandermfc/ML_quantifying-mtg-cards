@@ -18,8 +18,8 @@ def main():
 	with open("parsedData/keywords.json", 'w') as file4:
 		json.dump(OTD, file4)
 	#Put descriptions in a json file.
-	#with open("parsedData/descriptions.json", 'w') as descfile:
-	#	json.dump(OTD2, descfile)
+	# with open("descriptions.json", 'w') as descfile:
+	# 	json.dump(OTD2, descfile)
 
 def get_data(data, keywords):
 	sets = {};
