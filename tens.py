@@ -4,11 +4,15 @@ import unicodecsv as csv
 import numpy as np
 import json
 import matplotlib.pyplot as plt
+import re
+import operator
+import os
+
 
 settings = tf.app.flags
 SETTINGS = settings.FLAGS
-settings.DEFINE_float('alpha', 3, 'Initial learning rate.')
-settings.DEFINE_integer('max_steps', 10000, 'Number of steps to run trainer.')
+settings.DEFINE_float('alpha', 0.00000001, 'Initial learning rate.')
+settings.DEFINE_integer('max_steps', 1000, 'Number of steps to run trainer.')
 settings.DEFINE_integer('display_step', 100, 'Display logs per step.')
 
 ngramin = {}
@@ -16,7 +20,7 @@ ngramin = {}
 #import csv file
 def separateInputs():
 	random.seed()
-	with open("splitData/input3.csv", "r") as inputfile:
+	with open("splitData/input4.csv", "r") as inputfile:
 		with open("splitData/learningData.csv", "w") as learning:
 			with open("splitData/validationData.csv", "w") as validation:
 				with open("splitData/testData.csv", "w") as test:
@@ -381,7 +385,7 @@ def keywordsCount():
 
 	for k in range(1, len(input3)):
 		if input3[k][7] != "[]":
-			input3[k][7] = input3[k][7].translate(None, " []'")
+			input3[k][7] = input3[k][7].replace(' ','').replace('[','').replace(']','').replace('\'','')
 			temp = input3[k][7].split(",")
 			som = 0
 			for t in range(0, len(temp)):
@@ -409,6 +413,7 @@ def main():
 	#rarityChange()
 	#getNGramCount()
 	#separateInputs()
+	#keywordsCount()
 	[X, Y] = read_data("splitData/learningData.csv")
 	[test_X, test_Y] = read_dataTest("splitData/testData.csv")
 	#X = normalize(X)
