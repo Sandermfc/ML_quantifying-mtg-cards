@@ -17,7 +17,6 @@ Council
 Deathtouch
 Defender
 Devoid
-Enchant
 Flash
 Flying
 Haste
@@ -85,6 +84,7 @@ Hideaway
 Horsemanship
 Infect
 Inspired
+Ingest
 Kicker
 Landfall
 Madness
