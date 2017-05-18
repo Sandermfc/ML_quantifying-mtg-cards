@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/sandermfc/Desktop/project4/ML_quantifying-mtg-cards/dnn_mtg_price_predictor"
+all_model_checkpoint_paths: "/home/sandermfc/Desktop/project4/ML_quantifying-mtg-cards/dnn_mtg_price_predictor"

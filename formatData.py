@@ -3,6 +3,7 @@ import json
 import re #regular expressions
 import datetime
 import splitdesc as splitdesc
+import math
 
 nGramDict = {};
 nGramVal = {};
@@ -149,16 +150,14 @@ def main():
 
 	#Heavily weighted average
 	for ngram in nGramDict:
-		minOccurences = 1;
+		minOccurences = 3;
 		priceList = [];
 		if(len(nGramDict[ngram]) >= minOccurences):
 			for price in nGramDict[ngram]:
 				priceList.append(price);
-			priceList.sort();
-			val=0;
-			for k in range(0, len(priceList)):
-				val = val + float(priceList[k].encode('utf-8'));
-			val/=len(priceList);
+			priceList = sorted(priceList);
+			val=priceList[len(priceList)/2] #mediane
+
 			print(ngram + " --> "+str(val));
 			nGramVal[ngram] = val;
 			
@@ -306,7 +305,7 @@ def getNumberOfPrintings(cardName, printings):
 
 def getPt(val):
 	if "*" in val:
-		return 1;
+		return 4;
 	else:
 		return float(val);
 
