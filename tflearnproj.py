@@ -184,22 +184,10 @@ def rarityChange():
 					row[5] = 12
 				writer.writerow(row)
 
-def polyn(X):
-	for i in range(len(X)):
-		X[i][0] = 0.03566*pow(X[i][0],2) - 0.07401*X[i][0] - 0.03566
-		X[i][1] = 0.0000972*pow(X[i][1], 5) - 0.004812*pow(X[i][1], 4) + 0.07381*pow(X[i][1],3) - 0.3591*pow(X[i][1],2) + 0.5503*X[i][1] + 0.01723
-		X[i][2] = -0.01296*X[i][2]
-		X[i][3] = 0.00003123*pow(X[i][3],5) - 0.001432*pow(X[i][3],4) + 0.02162*pow(X[i][3],3) - 0.1175*pow(X[i][3],2) + 0.1829*X[i][3] + 0.05195
-		X[i][4] = 0.01329*pow(X[i][4],2) - 0.05062*X[i][4] - 0.01329
-		X[i][5] = 0.004992*pow(X[i][5],2) + 0.05619*X[i][5] - 0.004992
-		X[i][6] = -0.00003626*pow(X[i][6],7) + 0.0008285*pow(X[i][6],6) - 0.007141*pow(X[i][6],5) + 0.02922*pow(X[i][6],4) - 0.05931*pow(X[i][6],3) + 0.05915*pow(X[i][6],2) - 0.02199*X[i][6] - 0.04356
-		X[i][7] = 0.2261*pow(X[i][7],6) - 0.007512*pow(X[i][7],5) - 0.7398*pow(X[i][7],4) + 0.07484*pow(X[i][7],3) + 0.5864*pow(X[i][7],2) - 0.06682*X[i][7] - 0.107
-
 def learn(train_X, train_Y, test_X, test_Y):
 
 	# Linear Regression graph
 	net = tflearn.input_data(shape=[None,9])
-	#net = tflearn.layers.normalization.batch_normalization (net, beta=0.0, gamma=1.0, epsilon=1e-05, decay=0.9, stddev=0.002, trainable=True, restore=True, reuse=False, scope=None, name='BatchNormalization')
 	net = tflearn.fully_connected(net, 9, activation="relu", name="fully_connected_1")
 	net = tflearn.dropout(net, 0.7, name="dropout_1")
 	net = tflearn.fully_connected(net, 81, activation="relu", name="fully_connected_2")
@@ -228,7 +216,7 @@ def test(input_, realValues = None):
 	net = tflearn.fully_connected(net, 9, activation="relu", name="fully_connected_1")
 	net = tflearn.dropout(net, 0.7, name="dropout_1")
 	net = tflearn.fully_connected(net, 81, activation="relu", name="fully_connected_2")
-	net = tflearn.dropout(net, 0.5, name="dropout_2")
+	net = tflearn.dropout(net, 0.7, name="dropout_2")
 	net = tflearn.fully_connected(net, 1, activation="softplus", name="single_output")
 	regression = tflearn.regression(net, optimizer='sgd', loss='mean_square', metric='R2', learning_rate=0.1, name="regression")
 	m = tflearn.DNN(regression, tensorboard_verbose=3)
@@ -237,8 +225,12 @@ def test(input_, realValues = None):
 	
 	prediction = m.predict(input_)
 	if(not realValues is None):
+		tot = 0.0
 		for i,j in zip(prediction, realValues):
 			print(str(i)+" "+str(j))
+			tot += i-j
+		tot/=len(prediction)
+		print("On average, we are off by "+str(tot)+"$")
 	else:
 		print(prediction)
 

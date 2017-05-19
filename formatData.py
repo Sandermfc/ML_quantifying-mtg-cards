@@ -148,9 +148,9 @@ def main():
 		else:
 			print("ERROR, "+setCode+" does not exist in bigFile");
 
-	#Heavily weighted average
+	#Mediane des prix
 	for ngram in nGramDict:
-		minOccurences = 3;
+		minOccurences = 3
 		priceList = [];
 		if(len(nGramDict[ngram]) >= minOccurences):
 			for price in nGramDict[ngram]:
