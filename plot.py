@@ -15,9 +15,11 @@ def normalize(train_X):
 	return (train_X - mean) / std
 
 def main():
-	with open("splitData/input3.csv", 'r') as inputfile:
+	with open("splitData/input4.csv", 'r') as inputfile:
+		inputfile.readline()
 		reader = csv.reader(inputfile,delimiter = ",")
 		data = list(reader)
+
 		x_cmc = []
 		x_description = []
 		x_numOfColors = []
@@ -25,6 +27,7 @@ def main():
 		x_power = []
 		x_rarity = []
 		x_toughness = []
+		x_keywords = []
 		x_releaseDate = []
 		y_price = []
 		n = len(data)
@@ -36,8 +39,9 @@ def main():
 			x_power.append(float(row[4].encode("utf-8")))
 			x_rarity.append(float(row[5].encode("utf-8")))
 			x_toughness.append(float(row[6].encode("utf-8")))
-			x_releaseDate.append(float(row[7].encode("utf-8")))
-			y_price.append(float(row[8].encode("utf-8")))
+			x_keywords.append(float(row[7].encode("utf-8")))
+			x_releaseDate.append(float(row[8].encode("utf-8")))
+			y_price.append(float(row[9].encode("utf-8")))
 
 
 	x_cmc = normalize(x_cmc)
@@ -47,6 +51,7 @@ def main():
 	x_power = normalize(x_power)
 	x_rarity = normalize(x_rarity)
 	x_toughness = normalize(x_toughness)
+	x_keywords = normalize(x_keywords)
 	x_releaseDate = normalize(x_releaseDate)
 	y_price = normalize(y_price)
 
@@ -189,20 +194,39 @@ def main():
 	#-3.626e-05 x + 0.0008285 x - 0.007141 x + 0.02922 x - 0.05931 x + 0.05915 x - 0.02199 x - 0.04356
 
 #-------------------------------------------------------------------
-	listc = zip(x_releaseDate, y_price)
+	listc = zip(x_keywords, y_price)
 	listc = sorted(listc)
-	[x_releaseDate, y_price] = zip(*listc)
+	[x_keywords, y_price] = zip(*listc)
 
-	plt.plot(x_releaseDate, y_price, 'ro', label='Original data')
-	p = np.polyfit(x_releaseDate, y_price, 6)
+	plt.plot(x_keywords, y_price, 'ro', label='Original data')
+	p = np.polyfit(x_keywords, y_price, 6)
 	f = np.poly1d(p)
 	print f
 
-	x_new = np.linspace(x_releaseDate[0], x_releaseDate[-1], 100)
+	x_new = np.linspace(x_keywords[0], x_keywords[-1], 100)
 	y_new = f(x_new)
 
-	plt.plot(x_releaseDate,y_price,'ro')
+	plt.plot(x_keywords,y_price,'ro')
 	plt.plot(x_new, y_new, '-')
+
+	#        6            5          4           3          2
+	#0.2261 x - 0.007512 x - 0.7398 x + 0.07484 x + 0.5864 x - 0.06682 x - 0.107
+
+#-------------------------------------------------------------------
+	#listc = zip(x_releaseDate, y_price)
+	#listc = sorted(listc)
+	#[x_releaseDate, y_price] = zip(*listc)
+
+	#plt.plot(x_releaseDate, y_price, 'ro', label='Original data')
+	#p = np.polyfit(x_releaseDate, y_price, 6)
+	#f = np.poly1d(p)
+	#print f
+
+	#x_new = np.linspace(x_releaseDate[0], x_releaseDate[-1], 100)
+	#y_new = f(x_new)
+
+	#plt.plot(x_releaseDate,y_price,'ro')
+	#plt.plot(x_new, y_new, '-')
 
 	#        6            5          4           3          2
 	#0.2261 x - 0.007512 x - 0.7398 x + 0.07484 x + 0.5864 x - 0.06682 x - 0.107
